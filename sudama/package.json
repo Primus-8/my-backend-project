@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "dependencies": {
     "uploadthing": "^5.0.0",
-    "formidable": "^3.7.0"
+    "formidable": "^2.2.2"
   }
 }
