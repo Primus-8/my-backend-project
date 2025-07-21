@@ -1,33 +1,6 @@
-import { IncomingForm } from "formidable";
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export default function handler(req, res) {
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Only POST allowed" });
-    return;
-  }
-
-  const form = new IncomingForm();
-  form.parse(req, (err, fields, files) => {
-    if (err) {
-      res.status(500).json({ error: "Form parse error" });
-      return;
-    }
-    const file = files.file;
-    if (!file) {
-      res.status(400).json({ error: "No file uploaded. Field name should be 'file'." });
-      return;
-    }
-    res.status(200).json({
-      message: "File mil gaya!",
-      filename: file.originalFilename || file.name,
-      mimetype: file.mimetype || file.type,
-      size: file.size,
-    });
-  });
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/frontend/index.html" }
+  ]
 }
