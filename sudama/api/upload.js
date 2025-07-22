@@ -7,7 +7,7 @@ export const config = {
   },
 };
 
-// Cloudinary configuration from environment variables
+// Cloudinary config using env variables
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -32,37 +32,38 @@ export default function handler(req, res) {
   const form = new IncomingForm();
 
   form.parse(req, async (err, fields, files) => {
-    if (err) {
-      res.status(500).json({ error: "Form parse error" });
-      return;
-    }
-    const file = files.file;
-    if (!file) {
-      res.status(400).json({ error: "No file uploaded. Field should be 'file'." });
-      return;
-    }
-
     try {
-      // Cloudinary pe upload karo file ko
+      if (err) {
+        console.error("Form parse error", err);
+        return res.status(500).json({ error: "Form parse error" });
+      }
+
+      const file = files.file;
+      if (!file) {
+        return res.status(400).json({ error: "No file uploaded. Field should be 'file'." });
+      }
+
       const result = await cloudinary.v2.uploader.upload(file.filepath || file.path, {
         folder: "user_uploads",
         resource_type: "auto",
       });
 
-      // Ab response me photo ki detail + uska link bhejo
       res.status(200).json({
         message: "File uploaded!",
         filename: file.originalFilename || file.name,
         size: file.size,
         mimetype: file.mimetype || file.type,
-        url: result.secure_url,   // <-- yeh image ka public link hai
-        public_id: result.public_id
+        url: result.secure_url,
+        public_id: result.public_id,
       });
-    } catch(uploadError) {
+
+    } catch (uploadError) {
+      console.error("Cloudinary upload failed:", uploadError);
       res.status(500).json({
         error: "Cloudinary upload failed",
-        details: uploadError.message
+        details: uploadError.message,
       });
     }
   });
-        }
+          }
+    
